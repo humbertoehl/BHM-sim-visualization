@@ -140,7 +140,7 @@ class BoseHubbard1DApp:
 
         subtitle = tk.Label(
             self.root,
-            text="1D chain with peridic boundary conditions\n M sites with N particles",
+            text="1D chain with periodic boundary conditions\n M sites with N particles",
             font=("Helvetica", 15),
             bg="#ececec",
             fg="#202020",
