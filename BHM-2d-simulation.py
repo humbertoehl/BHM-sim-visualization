@@ -484,20 +484,20 @@ class BoseHubbard2DGutzwillerApp:
         psi = self.cached_result["psi"]
 
         top_components = np.argsort(probabilities)[::-1][:min(5, len(probabilities))]
-        top_string = ", ".join([f"n={n}: {probabilities[n]*100:.3f}%" for n in top_components])
+        top_string = ", ".join([f"n={n}: {probabilities[n]*100:.2f}%" for n in top_components])
 
         info = (
-            f"t/U = {self.cached_t:.6f}\n"
-            f"E_site = {energy_site:.8f}\n"
-            f"E_total = {energy_total:.8f}\n"
-            f"rho(target) = N/(Lx·Ly) = {n_particles/num_sites:.6f}\n"
-            f"rho(from optimizer) = {rho:.6f}\n"
-            f"psi = <a> = {psi:.6f}\n"
+            f"t/U = {self.cached_t:.3f}\n"
+            f"E_site = {energy_site:.3f}\n"
+            f"E_total = {energy_total:.3f}\n"
+            f"rho(target) = N/(Lx·Ly) = {n_particles/num_sites:.3f}\n"
+            f"rho(from optimizer) = {rho:.3f}\n"
+            f"psi = <b> = {psi:.3f}\n"
             f"Exact sampled total particles = {sum(sampled_state)}\n"
             f"Measured configuration = {sampled_state}\n"
-            f"Dominant local probabilities: {top_string}\n\n"
-            f"'Simulate' optimizes the homogeneous Gutzwiller state at fixed density.\n"
-            f"'New Sample' draws another exact-N configuration from the conditioned product state."
+            f"Local probabilities: {top_string}\n\n"
+            f"'Simulate' optimizes Gutzwiller coefficients at fixed density.\n"
+            f"'New Sample' draws another exact-N configuration from the same product state."
         )
         self.info_string.set(info)
 
