@@ -10,7 +10,7 @@ from scipy.special import logsumexp
 U_DEFAULT = 1.0
 Z_COORDINATION = 4
 LOGT_MIN = -2.0
-LOGT_MAX = 2.0
+LOGT_MAX = 0.0
 
 
 def local_hilbert_dimension(n_max):
@@ -224,7 +224,7 @@ class BoseHubbard2DGutzwillerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Bose-Hubbard 2D")
-        self.root.geometry("1180x920")
+        self.root.geometry("1100x750")
         self.root.configure(bg="#ececec")
 
         self.rng = np.random.default_rng()
@@ -328,7 +328,7 @@ class BoseHubbard2DGutzwillerApp:
             orient="horizontal",
             variable=self.logt_var,
             command=lambda _e=None: self._update_t_label(),
-            length=220,
+            length=150,
             width=20,
             bg="#ececec",
             highlightthickness=0,
@@ -366,24 +366,35 @@ class BoseHubbard2DGutzwillerApp:
         )
         self.canvas.pack(padx=20, pady=8)
 
-        info_box = tk.Label(
-            self.root,
-            textvariable=self.info_string,
-            justify="left",
-            anchor="w",
-            font=("Consolas", 10),
+        info_frame = tk.Frame(self.root, bg="#ececec")
+        info_frame.pack(fill="both", expand=False, padx=20, pady=(4, 16))
+
+        scrollbar = tk.Scrollbar(info_frame)
+        scrollbar.pack(side="right", fill="y")
+
+        self.info_box = tk.Text(
+            info_frame,
+            height=5,
+            wrap="word",
+            font=("Consolas", 14),
             bg="#f8f8f8",
             fg="#202020",
             bd=1,
             relief="solid",
             padx=12,
             pady=10,
+            yscrollcommand=scrollbar.set,
         )
-        info_box.pack(fill="x", padx=20, pady=(4, 16))
+
+        self.info_box.pack(side="left", fill="both", expand=True)
+        scrollbar.config(command=self.info_box.yview)
+
+        # make it read-only
+        self.info_box.config(state="disabled")
 
     def _update_t_label(self):
-        t = 10 ** self.logt_var.get()
-        self.t_string.set(f"(t/U) = {t:.4}")
+        t = 10 ** self.logt_var.get()*4
+        self.t_string.set(f"(zt/U) = {t:.4}")
 
     def _update_state_label(self):
         try:
@@ -487,7 +498,7 @@ class BoseHubbard2DGutzwillerApp:
         top_string = ", ".join([f"n={n}: {probabilities[n]*100:.2f}%" for n in top_components])
 
         info = (
-            f"t/U = {self.cached_t:.3f}\n"
+            f"zt/U = {self.cached_t*4:.3f}\n"
             f"E_site = {energy_site:.3f}\n"
             f"E_total = {energy_total:.3f}\n"
             f"rho(target) = N/(Lx·Ly) = {n_particles/num_sites:.3f}\n"
@@ -499,7 +510,10 @@ class BoseHubbard2DGutzwillerApp:
             f"'Simulate' optimizes Gutzwiller coefficients at fixed density.\n"
             f"'New Sample' draws another exact-N configuration from the same product state."
         )
-        self.info_string.set(info)
+        self.info_box.config(state="normal")
+        self.info_box.delete("1.0", tk.END)
+        self.info_box.insert(tk.END, info)
+        self.info_box.config(state="disabled")
 
     def draw_grid(self, state, lx, ly):
         self.canvas.delete("all")
